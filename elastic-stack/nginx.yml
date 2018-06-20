@@ -1,0 +1,44 @@
+---
+- name: Instalacion de Nginx como RP
+  become: no
+  hosts: "{{ elastic }}"
+
+  vars:
+    elk_kibana_user: admin
+    elk_kibana_pass: admin
+    nginx_workerconnections: 1024
+    nginx_errorlog: "/var/log/nginx/error.log"
+    nginx_keepalivetimeout: 65
+    elk_kibanaport: 5600
+    nginx_port: 80
+
+  tasks:
+
+    - name: Installing EPEL repo
+      copy: src=files/repo-epel.j2 dest=/etc/yum.repos.d/epel.repo
+
+    - name: Installing Nginx and http-tools
+      yum: name={{ item }} state=installed
+      with_items:
+        - nginx
+        - httpd-tools
+
+    - name: Create Kibana password
+      shell:
+        echo "{{ elk_kibana_user }}:$(openssl passwd -crypt {{ elk_kibana_pass }}):kibana" |tee .kibana.htpasswd
+      args:
+        chdir: /etc/nginx/conf.d
+        creates: /etc/nginx/conf.d/.kibana.htpasswd
+      register: http_pass_gen
+      when: elk_kibana_user is defined and elk_kibana_password is defined
+
+    - name: Copying nginx conf
+      template: src=files/nginx.conf.j2 dest=/etc/nginx/nginx.conf
+
+    - name: Copying Kibana conf
+      template: src=files/kibana-conf.j2 dest=/etc/nginx/conf.d/kibana.conf
+      notify: Restart Nginx
+
+  handlers:
+    - name: Restart Nginx
+      service: name=nginx state=restarted

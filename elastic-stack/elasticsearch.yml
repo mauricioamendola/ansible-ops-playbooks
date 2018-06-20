@@ -1,0 +1,13 @@
+---
+- name: Instalacion de Elasticsearch
+  become: no
+  hosts: "{{ elastic }}"
+  tasks:
+    - name: Install Elasticsearch
+      yum: name=elasticsearch state=installed
+      tags:
+        - install_es
+
+    #- name: Restrict hosts
+    #  lineinfile: 'dest=/opt/kibana/config/kibana.yml regexp=server.host line="server.host: localhost"'
+    #  notify: Restart kibana

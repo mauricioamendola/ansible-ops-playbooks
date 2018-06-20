@@ -1,0 +1,13 @@
+---
+- name: Instalacion de Kibana
+  become: no
+  hosts: "{{ elastic }}"
+  tasks:
+    - name: Install Logstash
+      yum: name=logstash state=installed
+      tags:
+        - install_logstash
+
+    #- name: Restrict hosts
+    #  lineinfile: 'dest=/opt/kibana/config/kibana.yml regexp=server.host line="server.host: localhost"'
+    #  notify: Restart kibana

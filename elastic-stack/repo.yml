@@ -1,0 +1,12 @@
+---
+- name: Instala el repo de elasticsearch
+  become: no
+  hosts: "{{ elastic }}"
+  vars:
+    elasticsearch_version: 6.x
+  tasks:
+    - name: Import Elasticsearch public GPG key into rpm
+      rpm_key: state=present key=https://artifacts.elastic.co/GPG-KEY-elasticsearch
+
+    - name: Copying yum repo for Elasticsearch
+      template: src=files/repo.j2 dest=/etc/yum.repos.d/elasticsearch.repo owner=root group=root mode=0644

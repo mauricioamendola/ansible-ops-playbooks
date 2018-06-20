@@ -1,0 +1,13 @@
+---
+- name: Instalacion de Kibana
+  become: no
+  hosts: "{{ elastic }}"
+  tasks:
+    - name: Install Kibana
+      yum: name=kibana state=installed
+      tags:
+        - install_kibana
+
+    #- name: Restrict hosts
+    #  lineinfile: 'dest=/opt/kibana/config/kibana.yml regexp=server.host line="server.host: localhost"'
+    #  notify: Restart kibana

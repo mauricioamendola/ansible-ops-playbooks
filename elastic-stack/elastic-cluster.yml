@@ -1,0 +1,4 @@
+- import_playbook: java.yml
+- import_playbook: repo.yml
+- import_playbook: kibana.yml
+- import_playbook: elasticsearch.yml

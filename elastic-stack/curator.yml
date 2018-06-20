@@ -1,0 +1,18 @@
+---
+- name: Instalacion de Curator
+  become: no
+  hosts: "{{ elastic }}"
+
+  vars:
+    curator_version: 5
+  tasks:
+    - name: Copia de repository
+      template: src=files/repo-curator.j2 dest=/etc/yum.repos.d/curator.repo owner=root group=root mode=0644
+
+    - name: Install Elasticsearch-curator
+      yum: name=elasticsearch-curator state=installed
+      tags:
+        - install_curator
+
+   - name: Conf de crontab
+     cron:
