@@ -1,0 +1,26 @@
+---
+- name: Configura repo e instala paquete metricbeat
+  hosts: "{{ servers }}"
+  
+  vars:
+      es_port: 9200
+      es_host: 10.240.70.15
+      es_version: 6.2.4
+  tasks:
+    - name: "Copy elastic.repo"
+      copy: src=files/elastic.repo dest=/etc/yum.repos.d/
+
+    - name: "Instala agente metricbeat"
+      yum: name={{item}} state=present
+      with_items:
+        - metricbeat-{{ es_version }}
+
+    - name: "Configura agente metricbeat"
+      template: src=files/metricbeat.yml.j2 dest=/etc/metricbeat/metricbeat.yml
+      tags:
+        - template
+
+    - name: "Habilita e inicia servicio metricbeat"
+      service: name=metricbeat
+               state=restarted
+               enabled=yes
